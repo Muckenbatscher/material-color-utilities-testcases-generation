@@ -1674,8 +1674,9 @@ final class ColorSpec2025 extends ColorSpec2021 {
       // Recalculate the tone from desired contrast ratio if the current
       // contrast ratio is not enough or desired contrast level is decreasing
       // (<0).
+      var ratioOfTones = Contrast.ratioOfTones(bgTone, answer);
       answer =
-          Contrast.ratioOfTones(bgTone, answer) >= desiredRatio && scheme.contrastLevel >= 0
+              ratioOfTones >= desiredRatio && scheme.contrastLevel >= 0
               ? answer
               : DynamicColor.foregroundTone(bgTone, desiredRatio);
 
