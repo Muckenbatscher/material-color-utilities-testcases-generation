@@ -33,8 +33,6 @@ public class CsharpTestThemeCreator {
                 + colorName;
 
         var builder = new StringBuilder();
-        builder.append("using MaterialTheming.MaterialDesign;").append("\r\n");
-        builder.append("\r\n");
         builder.append("namespace MaterialTheming.Tests.KnownTestThemes." + variantName + ";").append("\r\n");
         builder.append("\r\n");
         builder.append("internal class " + csharpClassName + " : ITestTheme").append("\r\n");
@@ -233,4 +231,5 @@ public class CsharpTestThemeCreator {
     private static String GetCsharpProperty(String propertyName, String typeName, String valueLiteral){
         return "public " + typeName + " " + propertyName + " => " + valueLiteral + ";";
     }
+
 }
