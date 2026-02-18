@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 /** Named colors, otherwise known as tokens, or roles, in the Material Design system. */
 public final class MaterialDynamicColors {
 
-  private static final ColorSpec colorSpec = new ColorSpec2025();
+  private static final ColorSpec colorSpec = new ColorSpec2026();
 
   @NonNull
   public DynamicColor highestSurface(@NonNull DynamicScheme s) {

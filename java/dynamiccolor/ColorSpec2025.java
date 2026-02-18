@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 /** {@link ColorSpec} implementation for the 2025 spec. */
-final class ColorSpec2025 extends ColorSpec2021 {
+class ColorSpec2025 extends ColorSpec2021 {
 
   ////////////////////////////////////////////////////////////////
   // Surfaces [S]                                               //

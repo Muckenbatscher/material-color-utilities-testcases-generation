@@ -490,19 +490,21 @@ public final class DynamicColor {
           .setPalette(
               (s) -> {
                 Function<DynamicScheme, TonalPalette> palette =
-                    s.specVersion == specVersion ? extendedColor.palette : this.palette;
+                    s.specVersion.compareTo(specVersion) >= 0
+                        ? extendedColor.palette
+                        : this.palette;
                 return palette != null ? palette.apply(s) : null;
               })
           .setTone(
               (s) -> {
                 Function<DynamicScheme, Double> tone =
-                    s.specVersion == specVersion ? extendedColor.tone : this.tone;
+                    s.specVersion.compareTo(specVersion) >= 0 ? extendedColor.tone : this.tone;
                 return tone != null ? tone.apply(s) : null;
               })
           .setChromaMultiplier(
               (s) -> {
                 Function<DynamicScheme, Double> chromaMultiplier =
-                    s.specVersion == specVersion
+                    s.specVersion.compareTo(specVersion) >= 0
                         ? extendedColor.chromaMultiplier
                         : this.chromaMultiplier;
                 return chromaMultiplier != null ? chromaMultiplier.apply(s) : 1.0;
@@ -510,13 +512,15 @@ public final class DynamicColor {
           .setBackground(
               (s) -> {
                 Function<DynamicScheme, DynamicColor> background =
-                    s.specVersion == specVersion ? extendedColor.background : this.background;
+                    s.specVersion.compareTo(specVersion) >= 0
+                        ? extendedColor.background
+                        : this.background;
                 return background != null ? background.apply(s) : null;
               })
           .setSecondBackground(
               (s) -> {
                 Function<DynamicScheme, DynamicColor> secondBackground =
-                    s.specVersion == specVersion
+                    s.specVersion.compareTo(specVersion) >= 0
                         ? extendedColor.secondBackground
                         : this.secondBackground;
                 return secondBackground != null ? secondBackground.apply(s) : null;
@@ -524,19 +528,25 @@ public final class DynamicColor {
           .setContrastCurve(
               (s) -> {
                 Function<DynamicScheme, ContrastCurve> contrastCurve =
-                    s.specVersion == specVersion ? extendedColor.contrastCurve : this.contrastCurve;
+                    s.specVersion.compareTo(specVersion) >= 0
+                        ? extendedColor.contrastCurve
+                        : this.contrastCurve;
                 return contrastCurve != null ? contrastCurve.apply(s) : null;
               })
           .setToneDeltaPair(
               (s) -> {
                 Function<DynamicScheme, ToneDeltaPair> toneDeltaPair =
-                    s.specVersion == specVersion ? extendedColor.toneDeltaPair : this.toneDeltaPair;
+                    s.specVersion.compareTo(specVersion) >= 0
+                        ? extendedColor.toneDeltaPair
+                        : this.toneDeltaPair;
                 return toneDeltaPair != null ? toneDeltaPair.apply(s) : null;
               })
           .setOpacity(
               (s) -> {
                 Function<DynamicScheme, Double> opacity =
-                    s.specVersion == specVersion ? extendedColor.opacity : this.opacity;
+                    s.specVersion.compareTo(specVersion) >= 0
+                        ? extendedColor.opacity
+                        : this.opacity;
                 return opacity != null ? opacity.apply(s) : null;
               });
     }
