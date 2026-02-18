@@ -42,8 +42,7 @@ public class CsharpTestThemeCreator {
         builder.append("    ").append(GetCsharpProperty("IsDark", "bool", isDark ? "true" : "false")).append("\r\n");
         builder.append("    ").append(GetCsharpProperty("Variant", "Variant", "Variant." + variantName)).append("\r\n");
         builder.append("    ").append(GetCsharpProperty("ContrastLevelValue", "double", Double.toString(contrastLevel))).append("\r\n");
-        var specVersionCsharp = specVersion == ColorSpec.SpecVersion.SPEC_2021
-                ? "Spec2021" : "Spec2025";
+        var specVersionCsharp = GetSpecName(specVersion);
         builder.append("    ").append(GetCsharpProperty("SpecVersion", "SpecVersion", "SpecVersion." + specVersionCsharp)).append("\r\n");
         builder.append("\r\n");
 
@@ -157,6 +156,7 @@ public class CsharpTestThemeCreator {
             case "Content" -> new SchemeContent(hct, isDark, contrastLevel, specVersion, platform);
             case "Rainbow" -> new SchemeRainbow(hct, isDark, contrastLevel, specVersion, platform);
             case "FruitSalad" -> new SchemeFruitSalad(hct, isDark, contrastLevel, specVersion, platform);
+            case "CMF" -> new SchemeCmf(hct, isDark, contrastLevel, specVersion, platform);
             default -> null;
         };
     }
@@ -210,9 +210,12 @@ public class CsharpTestThemeCreator {
             return "NormalContrast";
     }
     private static String GetSpecName(ColorSpec.SpecVersion specVersion){
-        if (specVersion == ColorSpec.SpecVersion.SPEC_2025)
+        if (specVersion == ColorSpec.SpecVersion.SPEC_2026)
+            return "Spec2026";
+        else if (specVersion == ColorSpec.SpecVersion.SPEC_2025)
             return "Spec2025";
-        return "Spec2021";
+        else
+            return "Spec2021";
     }
 
     private static String GetColorFromArgb(int argb){

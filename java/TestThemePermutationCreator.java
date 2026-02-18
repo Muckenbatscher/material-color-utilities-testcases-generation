@@ -10,34 +10,44 @@ public class TestThemePermutationCreator {
         var variants = GetVariants();
         for (int i = 0; i < variants.length; i++) {
             var variant = variants[i];
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
+            if (!variant.equals("CMF")){
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
 
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
+                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
+            }
+
+            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2026));
+            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2026));
+            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2026));
+            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2026));
+            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2026));
+            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2026));
         }
         return permutations;
     }
 
     private static String[] GetVariants(){
         return new String[] {
-            "Monochrome",
-            "Neutral",
-            "TonalSpot",
-            "Vibrant",
-            "Expressive",
-            "Fidelity",
-            "Content",
-            "Rainbow",
-            "FruitSalad"
+                "Monochrome",
+                "Neutral",
+                "TonalSpot",
+                "Vibrant",
+                "Expressive",
+                "Fidelity",
+                "Content",
+                "Rainbow",
+                "FruitSalad",
+                "CMF"
         };
     }
 }
