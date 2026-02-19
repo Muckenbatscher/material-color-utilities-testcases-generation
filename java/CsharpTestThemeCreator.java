@@ -2,6 +2,7 @@ import dynamiccolor.ColorSpec;
 import dynamiccolor.DynamicScheme;
 import hct.Hct;
 import scheme.*;
+import java.util.ArrayList;
 
 public class CsharpTestThemeCreator {
 
@@ -16,29 +17,46 @@ public class CsharpTestThemeCreator {
     }
 
     public static CsharpTestThemeClass GetCsharpTestThemeClass(int colorIndex,
+                                                               int colorIndexTwo,
                                                                boolean isDark,
                                                                ContrastLevelType contrastLevelType,
                                                                ColorSpec.SpecVersion specVersion,
                                                                String variantName){
+        var specifiedSecondColor = colorIndexTwo >= 0;
         var hct = GetColor(colorIndex);
         var colorName = GetColorName(colorIndex);
         var contrastLevel = GetContrastLevelValue(contrastLevelType);
         var platform = DynamicScheme.Platform.PHONE;
 
-        var scheme = CreateScheme(hct, isDark, contrastLevel, specVersion, platform, variantName);
+        String secondColorName = "";
+        Hct secondHct = null;
+        if (specifiedSecondColor){
+            secondColorName = GetColorName(colorIndexTwo);
+            secondHct = GetColor(colorIndexTwo);
+        }
+        var scheme = CreateScheme(hct, secondHct, isDark, contrastLevel, specVersion, platform, variantName);
 
         var csharpClassName = GetModeName(isDark) + "_"
                 + GetContrastLevelName(contrastLevelType) + "_"
                 + GetSpecName(specVersion) + "_"
                 + colorName;
+        if (specifiedSecondColor){
+            csharpClassName = csharpClassName + "_" + secondColorName;
+        }
 
         var builder = new StringBuilder();
         builder.append("namespace MaterialTheming.Tests.KnownTestThemes." + variantName + ";").append("\r\n");
         builder.append("\r\n");
-        builder.append("internal class " + csharpClassName + " : ITestTheme").append("\r\n");
+        var interfaceName = specifiedSecondColor
+                ? "ITestThemeSecondSourceColor"
+                : "ITestTheme";
+        builder.append("internal class " + csharpClassName + " : " + interfaceName).append("\r\n");
         builder.append("{").append("\r\n");
 
         builder.append("    ").append(GetCsharpColorProperty("SourceColor", hct.toInt()) + " //" + colorName).append("\r\n");
+        if (specifiedSecondColor){
+            builder.append("    ").append(GetCsharpColorProperty("SecondSourceColor", secondHct.toInt()) + " //" + secondColorName).append("\r\n");
+        }
         builder.append("    ").append(GetCsharpProperty("IsDark", "bool", isDark ? "true" : "false")).append("\r\n");
         builder.append("    ").append(GetCsharpProperty("Variant", "Variant", "Variant." + variantName)).append("\r\n");
         builder.append("    ").append(GetCsharpProperty("ContrastLevelValue", "double", Double.toString(contrastLevel))).append("\r\n");
@@ -141,22 +159,28 @@ public class CsharpTestThemeCreator {
     }
 
     private static DynamicScheme CreateScheme(Hct hct,
+                                              Hct secondHct,
                                               boolean isDark,
                                               double contrastLevel,
                                               ColorSpec.SpecVersion specVersion,
                                               DynamicScheme.Platform platform,
                                               String variantName){
+        var sourceColors = new ArrayList<Hct>();
+        sourceColors.add(hct);
+        if (secondHct != null) {
+            sourceColors.add(secondHct);
+        }
         return switch (variantName) {
-            case "Monochrome" -> new SchemeMonochrome(hct, isDark, contrastLevel, specVersion, platform);
-            case "Neutral" -> new SchemeNeutral(hct, isDark, contrastLevel, specVersion, platform);
-            case "TonalSpot" -> new SchemeTonalSpot(hct, isDark, contrastLevel, specVersion, platform);
-            case "Vibrant" -> new SchemeVibrant(hct, isDark, contrastLevel, specVersion, platform);
-            case "Expressive" -> new SchemeExpressive(hct, isDark, contrastLevel, specVersion, platform);
-            case "Fidelity" -> new SchemeFidelity(hct, isDark, contrastLevel, specVersion, platform);
-            case "Content" -> new SchemeContent(hct, isDark, contrastLevel, specVersion, platform);
-            case "Rainbow" -> new SchemeRainbow(hct, isDark, contrastLevel, specVersion, platform);
-            case "FruitSalad" -> new SchemeFruitSalad(hct, isDark, contrastLevel, specVersion, platform);
-            case "CMF" -> new SchemeCmf(hct, isDark, contrastLevel, specVersion, platform);
+            case "Monochrome" -> new SchemeMonochrome(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Neutral" -> new SchemeNeutral(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "TonalSpot" -> new SchemeTonalSpot(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Vibrant" -> new SchemeVibrant(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Expressive" -> new SchemeExpressive(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Fidelity" -> new SchemeFidelity(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Content" -> new SchemeContent(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "Rainbow" -> new SchemeRainbow(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "FruitSalad" -> new SchemeFruitSalad(sourceColors, isDark, contrastLevel, specVersion, platform);
+            case "CMF" -> new SchemeCmf(sourceColors, isDark, contrastLevel, specVersion, platform);
             default -> null;
         };
     }

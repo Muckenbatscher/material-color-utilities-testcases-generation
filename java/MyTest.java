@@ -32,9 +32,17 @@ public class MyTest {
     private static CsharpTestThemeClass[] CreateFromPermutation(TestThemePermutation permutation){
         var classes = new ArrayList<CsharpTestThemeClass>();
         for (int colorIndex = 0; colorIndex < CsharpTestThemeCreator.GetColorCount(); colorIndex++) {
-            var testClass = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex,
+            var testClass = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, -1,
                     permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, permutation.VariantName);
             classes.add(testClass);
+
+            if (permutation.VariantName.equals("CMF")) {
+                for (int colorIndexTwo = 0; colorIndexTwo < CsharpTestThemeCreator.GetColorCount(); colorIndexTwo++) {
+                    var testClassTwoColor = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, colorIndexTwo,
+                            permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, permutation.VariantName);
+                    classes.add(testClassTwoColor);
+                }
+            }
         }
         return classes.toArray(new CsharpTestThemeClass[0]);
     }
