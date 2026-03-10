@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout your fork
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Git config as github-actions
         run: |
@@ -60,8 +62,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create \
-            --base ${{ github.ref_name }} \
-            --head ${{ steps.branch_creation.outputs.branch_name }} \
-            --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
-            --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
+          # Check if a PR already exists for this exact branch
+          PR_COUNT=$(gh pr list --head ${{ steps.branch_creation.outputs.branch_name }} --state open --json number --jq 'length')
+          
+          if [ "$PR_COUNT" -eq "0" ]; then
+            gh pr create \
+              --base ${{ github.ref_name }} \
+              --head ${{ steps.branch_creation.outputs.branch_name }} \
+              --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
+              --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
+          fi
