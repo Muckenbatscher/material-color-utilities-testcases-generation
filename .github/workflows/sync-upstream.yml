@@ -1,0 +1,74 @@
+name: Sync Upstream Subdirectory
+
+on:
+  workflow_dispatch: 
+  schedule:
+    - cron: '0 2 * * *' # every day at 02:00 UTC 
+
+env:
+  UPSTREAM_REPO: 'material-foundation/material-color-utilities'
+  UPSTREAM_BRANCH: 'main'
+  TARGET_DIR: 'java/'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-subdirectory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git config as github-actions
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote and fetch
+        run: |
+          git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git
+          git fetch upstream ${{ env.UPSTREAM_BRANCH }}
+
+      - name: Check for upstream changes in subdirectory
+        id: check_diff
+        run: |
+          CHANGES=$(git diff --name-only HEAD...upstream/${{ env.UPSTREAM_BRANCH }} -- ${{ env.TARGET_DIR }})
+          
+          if [ -z "$CHANGES" ]; then
+            echo "No new upstream changes found in '${{ env.TARGET_DIR }}'."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in '${{ env.TARGET_DIR }}'!"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Sync Branch and Merge
+        if: steps.check_diff.outputs.has_changes == 'true'
+        id: branch_creation
+        run: |
+          BRANCH_NAME="sync-upstream-java"
+          git checkout -B $BRANCH_NAME
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} -m "Merge upstream changes for ${{ env.TARGET_DIR }}"
+          
+          git push --force origin $BRANCH_NAME
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.check_diff.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if a PR already exists for this exact branch
+          PR_COUNT=$(gh pr list --head ${{ steps.branch_creation.outputs.branch_name }} --state open --json number --jq 'length')
+          
+          if [ "$PR_COUNT" -eq "0" ]; then
+            gh pr create \
+              --base ${{ github.ref_name }} \
+              --head ${{ steps.branch_creation.outputs.branch_name }} \
+              --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
+              --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
+          fi
