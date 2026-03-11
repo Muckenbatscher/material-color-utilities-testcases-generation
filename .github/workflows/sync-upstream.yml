@@ -9,6 +9,7 @@ env:
   UPSTREAM_REPO: 'material-foundation/material-color-utilities'
   UPSTREAM_BRANCH: 'main'
   TARGET_DIR: 'java/'
+  SYNC_BRANCH_NAME: sync-upstream-java
 
 permissions:
   contents: write
@@ -27,13 +28,22 @@ jobs:
           git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git
           git fetch upstream ${{ env.UPSTREAM_BRANCH }}
 
-      - name: Check for upstream changes in subdirectory
+      - name: Check for upstream changes in Java subdirectory
         id: check_diff
         run: |
-          CHANGES=$(git diff --name-only HEAD...upstream/${{ env.UPSTREAM_BRANCH }} -- ${{ env.TARGET_DIR }})
-          
+          if git ls-remote --exit-code --heads origin ${{ env.SYNC_BRANCH_NAME }}; then
+            echo "Sync-Branch already exists. Diff against ${{ env.SYNC_BRANCH_NAME }}."
+            git fetch origin ${{ env.SYNC_BRANCH_NAME }}
+            BASE_REF="origin/${{ env.SYNC_BRANCH_NAME }}"
+          else
+            echo "Sync-Branch does not exist yet. Diff against current HEAD."
+            BASE_REF="HEAD"
+          fi
+
+          CHANGES=$(git diff --name-only $BASE_REF...upstream/${{ env.UPSTREAM_BRANCH }} -- ${{ env.TARGET_DIR }})
+
           if [ -z "$CHANGES" ]; then
-            echo "No new upstream changes found in '${{ env.TARGET_DIR }}'."
+            echo "No new upstream changes found in '${{ env.TARGET_DIR }}'"
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "Changes detected in '${{ env.TARGET_DIR }}'!"
@@ -46,16 +56,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create Sync Branch and Merge
+      - name: Create sync branch and merge
         if: steps.check_diff.outputs.has_changes == 'true'
         id: branch_creation
         run: |
-          BRANCH_NAME="sync-upstream-java"
-          git checkout -B $BRANCH_NAME
+          git checkout -B ${{ env.SYNC_BRANCH_NAME }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} -m "Merge upstream changes for ${{ env.TARGET_DIR }}"
           
-          git push --force origin $BRANCH_NAME
-          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          git push --force origin ${{ env.SYNC_BRANCH_NAME }}
 
       - name: Create Pull Request
         if: steps.check_diff.outputs.has_changes == 'true'
@@ -63,12 +71,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Check if a PR already exists for this exact branch
-          PR_COUNT=$(gh pr list --head ${{ steps.branch_creation.outputs.branch_name }} --state open --json number --jq 'length')
+          PR_COUNT=$(gh pr list --head ${{ env.SYNC_BRANCH_NAME }} --state open --json number --jq 'length')
           
           if [ "$PR_COUNT" -eq "0" ]; then
             gh pr create \
               --base ${{ github.ref_name }} \
-              --head ${{ steps.branch_creation.outputs.branch_name }} \
+              --head ${{ env.SYNC_BRANCH_NAME }} \
               --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
               --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
           fi
+
