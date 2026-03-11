@@ -1,4 +1,4 @@
-name: Sync Upstream Subdirectory
+name: Sync Upstream Java Subdirectory
 
 on:
   workflow_dispatch: 
@@ -18,15 +18,9 @@ jobs:
   sync-subdirectory:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your fork
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Set up Git config as github-actions
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Add upstream remote and fetch
         run: |
@@ -45,6 +39,12 @@ jobs:
             echo "Changes detected in '${{ env.TARGET_DIR }}'!"
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Set up Git config as github-actions
+        if: steps.check_diff.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create Sync Branch and Merge
         if: steps.check_diff.outputs.has_changes == 'true'
