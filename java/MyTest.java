@@ -8,13 +8,18 @@ import java.util.ArrayList;
 public class MyTest {
     public static void main(String[] args) {
         String targetDirectoryPath;
-        System.out.print("Enter target directory path: ");
-        try {
-            BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
-            targetDirectoryPath = inReader.readLine();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            return;
+        if (args.length > 0){
+            targetDirectoryPath = args[0];
+        }
+        else {
+            System.out.print("Enter target directory path: ");
+            try {
+                BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
+                targetDirectoryPath = inReader.readLine();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                return;
+            }
         }
 
         var testThemeList = TestThemePermutationCreator.CreatePermutations();
