@@ -53,10 +53,10 @@ public class MyTest {
     }
 
     private static void SaveTestThemeCsharpClass(CsharpTestThemeClass csharpClass, String targetDirectoryPath){
-        String sanitizedTargetDirectoryPath = targetDirectoryPath.endsWith("\\")
+        String sanitizedTargetDirectoryPath = targetDirectoryPath.endsWith("/")
                 ? targetDirectoryPath
-                : targetDirectoryPath + "\\";
-        String directoryName = sanitizedTargetDirectoryPath + csharpClass.GetVariantName() + "\\";
+                : targetDirectoryPath + "/";
+        String directoryName = sanitizedTargetDirectoryPath + csharpClass.GetVariantName() + "/";
         String fileName = directoryName + csharpClass.GetClassName() + ".cs";
 
         try {
