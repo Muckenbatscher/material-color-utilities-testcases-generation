@@ -62,7 +62,6 @@ jobs:
 
       - name: Create sync branch and merge
         if: steps.check_diff.outputs.has_changes == 'true'
-        id: branch_creation
         run: |
           git checkout -B ${{ env.SYNC_BRANCH_NAME }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit --no-ff
@@ -72,19 +71,32 @@ jobs:
           
           git commit -m "Merge upstream changes and update .upstream-commit to ${{ steps.check_diff.outputs.common_sha }}"
           git push --force origin ${{ env.SYNC_BRANCH_NAME }}
-
-      - name: Create Pull Request
+          
+      - name: Remove upstream remote
+        run: git remote remove upstream
+        
+      - name: Check for existing PR
         if: steps.check_diff.outputs.has_changes == 'true'
+        id: exsting_pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if a PR already exists for this exact branch
           PR_COUNT=$(gh pr list --head ${{ env.SYNC_BRANCH_NAME }} --state open --json number --jq 'length')
-          
           if [ "$PR_COUNT" -eq "0" ]; then
-            gh pr create \
-              --base ${{ github.ref_name }} \
-              --head ${{ env.SYNC_BRANCH_NAME }} \
-              --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
-              --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
+            echo "No existing PR found for the branch ${{ env.SYNC_BRANCH_NAME }}."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "Existing PR found for the branch ${{ env.SYNC_BRANCH_NAME }}."
+            echo "exists=true" >> $GITHUB_OUTPUT
           fi
+          
+      - name: Create Pull Request
+        if: steps.exsting_pr.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base ${{ github.ref_name }} \
+            --head ${{ env.SYNC_BRANCH_NAME }} \
+            --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
+            --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
