@@ -10,6 +10,7 @@ env:
   UPSTREAM_BRANCH: 'main'
   TARGET_DIR: 'java/'
   SYNC_BRANCH_NAME: sync-upstream-java
+  PR_TARGET_BRANCH_NAME: main
 
 permissions:
   contents: write
@@ -21,7 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          ref: ${{ env.PR_TARGET_BRANCH_NAME }}
+          fetch-depth: 0 # fetch full repository history, required for common ancestor commit
 
       - name: Add upstream remote and fetch
         run: |
@@ -35,11 +37,9 @@ jobs:
             echo "Sync-Branch already exists. Diff against ${{ env.SYNC_BRANCH_NAME }}."
             git fetch origin ${{ env.SYNC_BRANCH_NAME }}
             BASE_REF="origin/${{ env.SYNC_BRANCH_NAME }}"
-            echo "local_branch=true" >> $GITHUB_OUTPUT
           else
-            echo "Sync-Branch does not exist yet. Diff against current HEAD."
-            BASE_REF="HEAD"
-            echo "local_branch=false" >> $GITHUB_OUTPUT
+            echo "Sync-Branch does not exist yet. Diff against PR target branch: ${{ env.PR_TARGET_BRANCH_NAME }}"
+            BASE_REF="origin/${{ env.PR_TARGET_BRANCH_NAME }}"
           fi
 
           echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
@@ -63,7 +63,7 @@ jobs:
         if: steps.check_diff.outputs.has_changes == 'true'
         id: common_ancestor
         run: |
-          COMMON_SHA=$(git merge-base $BASE_REF upstream/${{ env.UPSTREAM_BRANCH }})
+          COMMON_SHA=$(git merge-base ${{ steps.base_ref.outputs.base_ref }} upstream/${{ env.UPSTREAM_BRANCH }})
           echo "Most recent common ancestor commit: $COMMON_SHA"
           echo "common_sha=$COMMON_SHA" >> $GITHUB_OUTPUT
 
@@ -110,7 +110,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            --base ${{ github.ref_name }} \
+            --base ${{ env.PR_TARGET_BRANCH_NAME }} \
             --head ${{ env.SYNC_BRANCH_NAME }} \
             --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
             --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
