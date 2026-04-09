@@ -12,13 +12,24 @@ env:
   SYNC_BRANCH_NAME: sync-upstream-java
   PR_TARGET_BRANCH_NAME: main
 
-permissions:
-  contents: write
-  pull-requests: write
 
 jobs:
-  sync-subdirectory:
+  validate-ref:
     runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [ "${{ github.ref }}" != "refs/heads/${{ env.PR_TARGET_BRANCH_NAME }}" ]; then 
+            echo "Can only be run for branch ${{ env.PR_TARGET_BRANCH_NAME }}"
+            exit 1
+          fi
+
+  sync-subdirectory:
+    needs: 
+      - validate-ref
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -78,11 +89,11 @@ jobs:
         run: |
           git checkout -B ${{ env.SYNC_BRANCH_NAME }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit --no-ff
-
-          echo "${{ steps.check_diff.outputs.common_sha }}" > .upstream-commit
+          
+          echo "${{ steps.common_ancestor.outputs.common_sha }}" > .upstream-commit
           git add .upstream-commit
           
-          git commit -m "Merge upstream changes and update .upstream-commit to ${{ steps.check_diff.outputs.common_sha }}"
+          git commit -m "Merge upstream changes and update .upstream-commit to ${{ steps.common_ancestor.outputs.common_sha }}"
           git push --force origin ${{ env.SYNC_BRANCH_NAME }}
 
       - name: Remove upstream remote
