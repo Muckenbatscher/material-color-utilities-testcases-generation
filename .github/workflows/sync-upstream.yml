@@ -28,17 +28,26 @@ jobs:
           git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git
           git fetch upstream ${{ env.UPSTREAM_BRANCH }}
 
-      - name: Check for upstream changes in Java subdirectory
-        id: check_diff
+      - name: Determine base ref
+        id: base_ref
         run: |
           if git ls-remote --exit-code --heads origin ${{ env.SYNC_BRANCH_NAME }}; then
             echo "Sync-Branch already exists. Diff against ${{ env.SYNC_BRANCH_NAME }}."
             git fetch origin ${{ env.SYNC_BRANCH_NAME }}
             BASE_REF="origin/${{ env.SYNC_BRANCH_NAME }}"
+            echo "local_branch=true" >> $GITHUB_OUTPUT
           else
             echo "Sync-Branch does not exist yet. Diff against current HEAD."
             BASE_REF="HEAD"
+            echo "local_branch=false" >> $GITHUB_OUTPUT
           fi
+
+          echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
+
+      - name: Check for upstream changes in Java subdirectory
+        id: check_diff
+        run: |
+          BASE_REF=${{ steps.base_ref.outputs.base_ref }}
 
           CHANGES=$(git diff --name-only $BASE_REF...upstream/${{ env.UPSTREAM_BRANCH }} -- ${{ env.TARGET_DIR }})
 
@@ -50,6 +59,10 @@ jobs:
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Determine common ancestor commit
+        if: steps.check_diff.outputs.has_changes == 'true'
+        id: common_ancestor
+        run: |
           COMMON_SHA=$(git merge-base $BASE_REF upstream/${{ env.UPSTREAM_BRANCH }})
           echo "Most recent common ancestor commit: $COMMON_SHA"
           echo "common_sha=$COMMON_SHA" >> $GITHUB_OUTPUT
@@ -71,10 +84,11 @@ jobs:
           
           git commit -m "Merge upstream changes and update .upstream-commit to ${{ steps.check_diff.outputs.common_sha }}"
           git push --force origin ${{ env.SYNC_BRANCH_NAME }}
-          
+
       - name: Remove upstream remote
+        if: steps.check_diff.outputs.has_changes == 'true'
         run: git remote remove upstream
-        
+
       - name: Check for existing PR
         if: steps.check_diff.outputs.has_changes == 'true'
         id: exsting_pr
@@ -89,9 +103,9 @@ jobs:
             echo "Existing PR found for the branch ${{ env.SYNC_BRANCH_NAME }}."
             echo "exists=true" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Create Pull Request
-        if: steps.exsting_pr.outputs.exists != 'true'
+        if: steps.check_diff.outputs.has_changes == 'true' && steps.exsting_pr.outputs.exists != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
