@@ -124,4 +124,6 @@ jobs:
             --base ${{ env.PR_TARGET_BRANCH_NAME }} \
             --head ${{ env.SYNC_BRANCH_NAME }} \
             --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
-            --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**."
+            --body "This automated PR syncs changes from the original upstream repository **${{ env.UPSTREAM_REPO }}**." \
+            --assignee "@me" \
+            --label "sync-upstream"
