@@ -31,7 +31,7 @@ jobs:
       contents: write
     
     outputs:
-      has_changes: ${{ steps.check_diff.outputs.has_changes }}
+      has_changes: ${{ steps.new_refs_required.outputs.required }}
       branch_exists: ${{ steps.base_ref.outputs.branch_exists }}
 
     steps:
@@ -75,21 +75,41 @@ jobs:
           fi
 
       - name: Determine common ancestor commit
-        if: steps.check_diff.outputs.has_changes == 'true'
         id: common_ancestor
         run: |
           COMMON_SHA=$(git merge-base ${{ steps.base_ref.outputs.base_ref }} upstream/${{ env.UPSTREAM_BRANCH }})
           echo "Most recent common ancestor commit: $COMMON_SHA"
           echo "common_sha=$COMMON_SHA" >> $GITHUB_OUTPUT
 
+          if [ -f .upstream-commit ]; then
+            OLD_SHA=$(cat .upstream-commit)
+          else
+            OLD_SHA="none"
+          fi
+
+          if [ "$COMMON_SHA" != "$OLD_SHA" ]; then
+            echo "SHA has changed (Old: $OLD_SHA, New: $COMMON_SHA)"
+            echo "sha_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "SHA is still the same ($OLD_SHA)"
+            echo "sha_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: New Refs required
+        id: new_refs_required
+        if: steps.check_diff.outputs.has_changes == 'true' || steps.common_ancestor.outputs.sha_changed == 'true'
+        run: |
+          echo "New refs are required."
+          echo "required=true" >> $GITHUB_OUTPUT
+
       - name: Set up Git config as github-actions
-        if: steps.check_diff.outputs.has_changes == 'true'
+        if: steps.new_refs_required.outputs.required == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create sync branch and merge
-        if: steps.check_diff.outputs.has_changes == 'true'
+        if: steps.new_refs_required.outputs.required == 'true'
         run: |
           git checkout -B ${{ env.SYNC_BRANCH_NAME }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit --no-ff
