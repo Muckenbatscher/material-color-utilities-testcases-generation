@@ -154,5 +154,5 @@ jobs:
             --head ${{ env.SYNC_BRANCH_NAME }} \
             --title "Sync: Updates in \`${{ env.TARGET_DIR }}\` from upstream" \
             --body "This automated PR syncs changes from the original upstream repository [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }})." \
-            --assignee "@me" \
+            --assignee "Muckenbatscher" \
             --label "sync-upstream"
