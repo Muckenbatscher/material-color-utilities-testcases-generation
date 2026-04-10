@@ -117,7 +117,7 @@ jobs:
           echo "${{ steps.common_ancestor.outputs.common_sha }}" > .upstream-commit
           git add .upstream-commit
           
-          git commit -m "Merge upstream changes" -m "Update .upstream-commit to `${{ steps.common_ancestor.outputs.common_sha }}`"
+          git commit -m "Merge upstream changes" -m "Update .upstream-commit to ${{ steps.common_ancestor.outputs.common_sha }}"
           git push --force origin ${{ env.SYNC_BRANCH_NAME }}
 
   create-pr:
