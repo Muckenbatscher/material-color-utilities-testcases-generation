@@ -44,115 +44,116 @@ public class CsharpTestThemeCreator {
             csharpClassName = csharpClassName + "_" + secondColorName;
         }
 
+        var newLine = System.lineSeparator();
         var builder = new StringBuilder();
-        builder.append("namespace MaterialTheming.Tests.KnownTestThemes." + variantName + ";").append("\r\n");
-        builder.append("\r\n");
+        builder.append("namespace MaterialTheming.Tests.KnownTestThemes." + variantName + ";").append(newLine);
+        builder.append(newLine);
         var interfaceName = specifiedSecondColor
                 ? "ITestThemeSecondSourceColor"
                 : "ITestTheme";
-        builder.append("internal class " + csharpClassName + " : " + interfaceName).append("\r\n");
-        builder.append("{").append("\r\n");
+        builder.append("internal class " + csharpClassName + " : " + interfaceName).append(newLine);
+        builder.append("{").append(newLine);
 
-        builder.append("    ").append(GetCsharpColorProperty("SourceColor", hct.toInt()) + " //" + colorName).append("\r\n");
+        builder.append("    ").append(GetCsharpColorProperty("SourceColor", hct.toInt()) + " //" + colorName).append(newLine);
         if (specifiedSecondColor){
-            builder.append("    ").append(GetCsharpColorProperty("SecondSourceColor", secondHct.toInt()) + " //" + secondColorName).append("\r\n");
+            builder.append("    ").append(GetCsharpColorProperty("SecondSourceColor", secondHct.toInt()) + " //" + secondColorName).append(newLine);
         }
-        builder.append("    ").append(GetCsharpProperty("IsDark", "bool", isDark ? "true" : "false")).append("\r\n");
-        builder.append("    ").append(GetCsharpProperty("Variant", "Variant", "Variant." + variantName)).append("\r\n");
-        builder.append("    ").append(GetCsharpProperty("ContrastLevelValue", "double", Double.toString(contrastLevel))).append("\r\n");
+        builder.append("    ").append(GetCsharpProperty("IsDark", "bool", isDark ? "true" : "false")).append(newLine);
+        builder.append("    ").append(GetCsharpProperty("Variant", "Variant", "Variant." + variantName)).append(newLine);
+        builder.append("    ").append(GetCsharpProperty("ContrastLevelValue", "double", Double.toString(contrastLevel))).append(newLine);
         var specVersionCsharp = GetSpecName(specVersion);
-        builder.append("    ").append(GetCsharpProperty("SpecVersion", "SpecVersion", "SpecVersion." + specVersionCsharp)).append("\r\n");
-        builder.append("\r\n");
+        builder.append("    ").append(GetCsharpProperty("SpecVersion", "SpecVersion", "SpecVersion." + specVersionCsharp)).append(newLine);
+        builder.append(newLine);
 
         // Primary
-        builder.append("    ").append("// Primary").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Primary", scheme.getPrimary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnPrimary", scheme.getOnPrimary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("PrimaryContainer", scheme.getPrimaryContainer())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryContainer", scheme.getOnPrimaryContainer())).append("\r\n");
+        builder.append("    ").append("// Primary").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Primary", scheme.getPrimary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnPrimary", scheme.getOnPrimary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("PrimaryContainer", scheme.getPrimaryContainer())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryContainer", scheme.getOnPrimaryContainer())).append(newLine);
 
         // Secondary
-        builder.append("    ").append("// Secondary").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Secondary", scheme.getSecondary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSecondary", scheme.getOnSecondary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SecondaryContainer", scheme.getSecondaryContainer())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryContainer", scheme.getOnSecondaryContainer())).append("\r\n");
+        builder.append("    ").append("// Secondary").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Secondary", scheme.getSecondary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSecondary", scheme.getOnSecondary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SecondaryContainer", scheme.getSecondaryContainer())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryContainer", scheme.getOnSecondaryContainer())).append(newLine);
 
         // Tertiary
-        builder.append("    ").append("// Tertiary").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Tertiary", scheme.getTertiary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnTertiary", scheme.getOnTertiary())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("TertiaryContainer", scheme.getTertiaryContainer())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryContainer", scheme.getOnTertiaryContainer())).append("\r\n");
+        builder.append("    ").append("// Tertiary").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Tertiary", scheme.getTertiary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnTertiary", scheme.getOnTertiary())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("TertiaryContainer", scheme.getTertiaryContainer())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryContainer", scheme.getOnTertiaryContainer())).append(newLine);
 
         // Error
-        builder.append("    ").append("// Error").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Error", scheme.getError())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnError", scheme.getOnError())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("ErrorContainer", scheme.getErrorContainer())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnErrorContainer", scheme.getOnErrorContainer())).append("\r\n");
+        builder.append("    ").append("// Error").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Error", scheme.getError())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnError", scheme.getOnError())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("ErrorContainer", scheme.getErrorContainer())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnErrorContainer", scheme.getOnErrorContainer())).append(newLine);
 
         // Surface
-        builder.append("    ").append("// Surface").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Surface", scheme.getSurface())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceVariant", scheme.getSurfaceVariant())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSurface", scheme.getOnSurface())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSurfaceVariant", scheme.getOnSurfaceVariant())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceDim", scheme.getSurfaceDim())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceBright", scheme.getSurfaceBright())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceTint", scheme.getSurfaceTint())).append("\r\n");
+        builder.append("    ").append("// Surface").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Surface", scheme.getSurface())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceVariant", scheme.getSurfaceVariant())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSurface", scheme.getOnSurface())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSurfaceVariant", scheme.getOnSurfaceVariant())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceDim", scheme.getSurfaceDim())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceBright", scheme.getSurfaceBright())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceTint", scheme.getSurfaceTint())).append(newLine);
 
         // Background
-        builder.append("    ").append("// Background").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Background", scheme.getBackground())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnBackground", scheme.getOnBackground())).append("\r\n");
+        builder.append("    ").append("// Background").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Background", scheme.getBackground())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnBackground", scheme.getOnBackground())).append(newLine);
 
         // Outline
-        builder.append("    ").append("// Outline").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Outline", scheme.getOutline())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OutlineVariant", scheme.getOutlineVariant())).append("\r\n");
+        builder.append("    ").append("// Outline").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Outline", scheme.getOutline())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OutlineVariant", scheme.getOutlineVariant())).append(newLine);
 
         // Shadow
-        builder.append("    ").append("// Shadow").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Shadow", scheme.getShadow())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("Scrim", scheme.getScrim())).append("\r\n");
+        builder.append("    ").append("// Shadow").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Shadow", scheme.getShadow())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("Scrim", scheme.getScrim())).append(newLine);
 
         // Inverse
-        builder.append("    ").append("// Inverse").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("InverseSurface", scheme.getInverseSurface())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("InverseOnSurface", scheme.getInverseOnSurface())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("InversePrimary", scheme.getInversePrimary())).append("\r\n");
+        builder.append("    ").append("// Inverse").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("InverseSurface", scheme.getInverseSurface())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("InverseOnSurface", scheme.getInverseOnSurface())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("InversePrimary", scheme.getInversePrimary())).append(newLine);
 
         // Primary Fixed
-        builder.append("    ").append("// Primary Fixed").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("PrimaryFixed", scheme.getPrimaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryFixed", scheme.getOnPrimaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("PrimaryFixedDim", scheme.getPrimaryFixedDim())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryFixedVariant", scheme.getOnPrimaryFixedVariant())).append("\r\n");
+        builder.append("    ").append("// Primary Fixed").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("PrimaryFixed", scheme.getPrimaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryFixed", scheme.getOnPrimaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("PrimaryFixedDim", scheme.getPrimaryFixedDim())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnPrimaryFixedVariant", scheme.getOnPrimaryFixedVariant())).append(newLine);
 
         // Secondary Fixed
-        builder.append("    ").append("// Secondary Fixed").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SecondaryFixed", scheme.getSecondaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryFixed", scheme.getOnSecondaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SecondaryFixedDim", scheme.getSecondaryFixedDim())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryFixedVariant", scheme.getOnSecondaryFixedVariant())).append("\r\n");
+        builder.append("    ").append("// Secondary Fixed").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SecondaryFixed", scheme.getSecondaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryFixed", scheme.getOnSecondaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SecondaryFixedDim", scheme.getSecondaryFixedDim())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnSecondaryFixedVariant", scheme.getOnSecondaryFixedVariant())).append(newLine);
 
         // Tertiary Fixed
-        builder.append("    ").append("// Tertiary Fixed").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("TertiaryFixed", scheme.getTertiaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryFixed", scheme.getOnTertiaryFixed())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("TertiaryFixedDim", scheme.getTertiaryFixedDim())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryFixedVariant", scheme.getOnTertiaryFixedVariant())).append("\r\n");
+        builder.append("    ").append("// Tertiary Fixed").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("TertiaryFixed", scheme.getTertiaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryFixed", scheme.getOnTertiaryFixed())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("TertiaryFixedDim", scheme.getTertiaryFixedDim())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("OnTertiaryFixedVariant", scheme.getOnTertiaryFixedVariant())).append(newLine);
 
         // Surface Container
-        builder.append("    ").append("// Surface Container").append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerLowest", scheme.getSurfaceContainerLowest())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerLow", scheme.getSurfaceContainerLow())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainer", scheme.getSurfaceContainer())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerHigh", scheme.getSurfaceContainerHigh())).append("\r\n");
-        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerHighest", scheme.getSurfaceContainerHighest())).append("\r\n");
+        builder.append("    ").append("// Surface Container").append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerLowest", scheme.getSurfaceContainerLowest())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerLow", scheme.getSurfaceContainerLow())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainer", scheme.getSurfaceContainer())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerHigh", scheme.getSurfaceContainerHigh())).append(newLine);
+        builder.append("    ").append(GetCsharpColorProperty("SurfaceContainerHighest", scheme.getSurfaceContainerHighest())).append(newLine);
 
-        builder.append("}").append("\r\n");
+        builder.append("}").append(newLine);
 
         var fileContent = builder.toString();
         return new CsharpTestThemeClass(csharpClassName, variantName, fileContent);
