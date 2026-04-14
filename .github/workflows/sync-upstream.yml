@@ -147,8 +147,25 @@ jobs:
             echo "exists=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check for differences to main
+        id: branch_diff
+        if: steps.existing_pr.outputs.exists == 'false' && needs.sync-subdirectory.outputs.branch_exists == 'true'
+        run: |
+          git fetch origin ${{ env.PR_TARGET_BRANCH_NAME }}
+          git fetch origin ${{ env.SYNC_BRANCH_NAME }}
+          
+          CHANGES=$(git diff origin/${{ env.PR_TARGET_BRANCH_NAME }}..origin/${{ env.SYNC_BRANCH_NAME }} --name-only)
+
+          if [ -z "$CHANGES" ]; then
+            echo "Branch '${{ env.SYNC_BRANCH_NAME }}' is identical to '${{ env.PR_TARGET_BRANCH_NAME }}'."
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+          else
+            echo "Branch '${{ env.SYNC_BRANCH_NAME }}' has differences."
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Pull Request
-        if: steps.existing_pr.outputs.exists != 'true' && (needs.sync-subdirectory.outputs.branch_exists == 'true' || needs.sync-subdirectory.outputs.has_changes == 'true')
+        if: steps.existing_pr.outputs.exists == 'false' && (needs.sync-subdirectory.outputs.has_changes == 'true' || steps.branch_diff.outputs.has_diff == 'true')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -159,4 +176,3 @@ jobs:
             --body "This automated PR syncs changes from the original upstream repository [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }})." \
             --assignee "Muckenbatscher" \
             --label "sync-upstream"
-            
