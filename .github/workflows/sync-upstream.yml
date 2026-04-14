@@ -12,7 +12,6 @@ env:
   SYNC_BRANCH_NAME: sync-upstream-java
   PR_TARGET_BRANCH_NAME: main
 
-
 jobs:
   validate-ref:
     runs-on: ubuntu-latest
@@ -95,12 +94,16 @@ jobs:
             echo "sha_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: New Refs required
+      - name: Evaluate if new refs are required
         id: new_refs_required
-        if: steps.check_diff.outputs.has_changes == 'true' || steps.common_ancestor.outputs.sha_changed == 'true'
         run: |
-          echo "New refs are required."
-          echo "required=true" >> $GITHUB_OUTPUT
+          if [ "${{ steps.check_diff.outputs.has_changes }}" == "true" ] || [ "${{ steps.common_ancestor.outputs.sha_changed }}" == "true" ]; then
+            echo "New refs are required."
+            echo "required=true" >> $GITHUB_OUTPUT
+          else
+            echo "No new refs required."
+            echo "required=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up Git config as github-actions
         if: steps.new_refs_required.outputs.required == 'true'
@@ -131,7 +134,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Check for existing PR
-        id: exsting_pr
+        id: existing_pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -145,7 +148,7 @@ jobs:
           fi
 
       - name: Create Pull Request
-        if: steps.exsting_pr.outputs.exists != 'true' && (needs.sync-subdirectory.outputs.branch_exists == 'true' || needs.sync-subdirectory.outputs.has_changes == 'true')
+        if: steps.existing_pr.outputs.exists != 'true' && (needs.sync-subdirectory.outputs.branch_exists == 'true' || needs.sync-subdirectory.outputs.has_changes == 'true')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -156,3 +159,4 @@ jobs:
             --body "This automated PR syncs changes from the original upstream repository [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }})." \
             --assignee "Muckenbatscher" \
             --label "sync-upstream"
+            
