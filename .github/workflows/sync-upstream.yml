@@ -30,7 +30,7 @@ jobs:
       contents: write
     
     outputs:
-      has_changes: ${{ steps.new_refs_required.outputs.required }}
+      has_changes: ${{ steps.check_diff.outputs.has_changes }}
       branch_exists: ${{ steps.base_ref.outputs.branch_exists }}
 
     steps:
@@ -73,54 +73,19 @@ jobs:
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Determine common ancestor commit
-        id: common_ancestor
-        run: |
-          COMMON_SHA=$(git merge-base ${{ steps.base_ref.outputs.base_ref }} upstream/${{ env.UPSTREAM_BRANCH }})
-          echo "Most recent common ancestor commit: $COMMON_SHA"
-          echo "common_sha=$COMMON_SHA" >> $GITHUB_OUTPUT
-
-          if [ -f .upstream-commit ]; then
-            OLD_SHA=$(cat .upstream-commit)
-          else
-            OLD_SHA="none"
-          fi
-
-          if [ "$COMMON_SHA" != "$OLD_SHA" ]; then
-            echo "SHA has changed (Old: $OLD_SHA, New: $COMMON_SHA)"
-            echo "sha_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "SHA is still the same ($OLD_SHA)"
-            echo "sha_changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Evaluate if new refs are required
-        id: new_refs_required
-        run: |
-          if [ "${{ steps.check_diff.outputs.has_changes }}" == "true" ] || [ "${{ steps.common_ancestor.outputs.sha_changed }}" == "true" ]; then
-            echo "New refs are required."
-            echo "required=true" >> $GITHUB_OUTPUT
-          else
-            echo "No new refs required."
-            echo "required=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Set up Git config as github-actions
-        if: steps.new_refs_required.outputs.required == 'true'
+        if: steps.check_diff.outputs.has_changes == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create sync branch and merge
-        if: steps.new_refs_required.outputs.required == 'true'
+        if: steps.check_diff.outputs.has_changes  == 'true'
         run: |
           git checkout -B ${{ env.SYNC_BRANCH_NAME }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit --no-ff
           
-          echo "${{ steps.common_ancestor.outputs.common_sha }}" > .upstream-commit
-          git add .upstream-commit
-          
-          git commit -m "Merge upstream changes" -m "Update .upstream-commit to ${{ steps.common_ancestor.outputs.common_sha }}"
+          git commit -m "Merge upstream changes"
           git push --force origin ${{ env.SYNC_BRANCH_NAME }}
 
   create-pr:
