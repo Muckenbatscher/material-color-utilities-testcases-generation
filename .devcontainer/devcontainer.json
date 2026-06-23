@@ -1,0 +1,17 @@
+{
+	"name": "MaterialTheming - Java Test Generation",
+    "image": "ubuntu:latest",
+    // More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+            "version": 17
+        }
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack"
+			]
+		}
+	}
+}
