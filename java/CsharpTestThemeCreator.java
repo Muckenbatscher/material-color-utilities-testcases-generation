@@ -21,12 +21,13 @@ public class CsharpTestThemeCreator {
                                                                boolean isDark,
                                                                ContrastLevelType contrastLevelType,
                                                                ColorSpec.SpecVersion specVersion,
+                                                               DynamicScheme.Platform platform,
                                                                String variantName){
         var specifiedSecondColor = colorIndexTwo >= 0;
         var hct = GetColor(colorIndex);
         var colorName = GetColorName(colorIndex);
         var contrastLevel = GetContrastLevelValue(contrastLevelType);
-        var platform = DynamicScheme.Platform.PHONE;
+        var platformName = GetPlatformName(platform);
 
         String secondColorName = "";
         Hct secondHct = null;
@@ -39,6 +40,7 @@ public class CsharpTestThemeCreator {
         var csharpClassName = GetModeName(isDark) + "_"
                 + GetContrastLevelName(contrastLevelType) + "_"
                 + GetSpecName(specVersion) + "_"
+                + platformName + "_"
                 + colorName;
         if (specifiedSecondColor){
             csharpClassName = csharpClassName + "_" + secondColorName;
@@ -60,6 +62,7 @@ public class CsharpTestThemeCreator {
         }
         builder.append("    ").append(GetCsharpProperty("IsDark", "bool", isDark ? "true" : "false")).append(newLine);
         builder.append("    ").append(GetCsharpProperty("Variant", "Variant", "Variant." + variantName)).append(newLine);
+        builder.append("    ").append(GetCsharpProperty("Platform", "Platform", "Platform." + platformName)).append(newLine);
         builder.append("    ").append(GetCsharpProperty("ContrastLevelValue", "double", Double.toString(contrastLevel))).append(newLine);
         var specVersionCsharp = GetSpecName(specVersion);
         builder.append("    ").append(GetCsharpProperty("SpecVersion", "SpecVersion", "SpecVersion." + specVersionCsharp)).append(newLine);
@@ -243,6 +246,13 @@ public class CsharpTestThemeCreator {
             return "Spec2021";
     }
 
+    private static String GetPlatformName(DynamicScheme.Platform platform){
+        return switch (platform) {
+            case PHONE -> "Phone";
+            case WATCH -> "Watch";
+        };
+    }
+
     private static String GetColorFromArgb(int argb){
         var hexString = Integer.toHexString(argb);
         // Ensure hex string has leading zeros if necessary
@@ -259,5 +269,4 @@ public class CsharpTestThemeCreator {
     private static String GetCsharpProperty(String propertyName, String typeName, String valueLiteral){
         return "public " + typeName + " " + propertyName + " => " + valueLiteral + ";";
     }
-
 }

@@ -1,5 +1,3 @@
-import dynamiccolor.ColorSpec;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,16 +34,18 @@ public class MyTest {
 
     private static CsharpTestThemeClass[] CreateFromPermutation(TestThemePermutation permutation){
         var classes = new ArrayList<CsharpTestThemeClass>();
-        for (int colorIndex = 0; colorIndex < CsharpTestThemeCreator.GetColorCount(); colorIndex++) {
-            var testClass = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, -1,
-                    permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, permutation.VariantName);
-            classes.add(testClass);
+        for (var platform : dynamiccolor.DynamicScheme.Platform.values()) {
+            for (int colorIndex = 0; colorIndex < CsharpTestThemeCreator.GetColorCount(); colorIndex++) {
+                var testClass = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, -1,
+                        permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, platform, permutation.VariantName);
+                classes.add(testClass);
 
-            if (permutation.VariantName.equals("CMF")) {
-                for (int colorIndexTwo = 0; colorIndexTwo < CsharpTestThemeCreator.GetColorCount(); colorIndexTwo++) {
-                    var testClassTwoColor = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, colorIndexTwo,
-                            permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, permutation.VariantName);
-                    classes.add(testClassTwoColor);
+                if (permutation.VariantName.equals("CMF")) {
+                    for (int colorIndexTwo = 0; colorIndexTwo < CsharpTestThemeCreator.GetColorCount(); colorIndexTwo++) {
+                        var testClassTwoColor = CsharpTestThemeCreator.GetCsharpTestThemeClass(colorIndex, colorIndexTwo,
+                                permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion, platform, permutation.VariantName);
+                        classes.add(testClassTwoColor);
+                    }
                 }
             }
         }
