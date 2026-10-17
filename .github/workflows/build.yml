@@ -1,0 +1,36 @@
+name: Build and run MyTest
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v6.0.1
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build project
+        run: mvn --batch-mode --no-transfer-progress package
+
+      - name: Run MyTest
+        run: |
+          output_dir="${RUNNER_TEMP}/mytest-output"
+          java -cp target/classes MyTest "$output_dir"
+
+          generated_file="$(find "$output_dir" -type f -name '*.cs' -print -quit)"
+          if [ -z "$generated_file" ]; then
+            echo "MyTest completed without generating any C# files."
+            exit 1
+          fi
