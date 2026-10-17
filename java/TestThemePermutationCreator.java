@@ -1,5 +1,4 @@
 import dynamiccolor.ColorSpec;
-import scheme.*;
 
 import java.util.ArrayList;
 import java.util.List;
