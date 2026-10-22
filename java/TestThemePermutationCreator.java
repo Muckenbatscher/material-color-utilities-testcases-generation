@@ -1,41 +1,27 @@
 import dynamiccolor.ColorSpec;
-
+import dynamiccolor.DynamicScheme;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestThemePermutationCreator {
-    public static List<TestThemePermutation> CreatePermutations(){
+    public static List<TestThemePermutation> CreatePermutations() {
         var permutations = new ArrayList<TestThemePermutation>();
-        var variants = GetVariants();
-        for (int i = 0; i < variants.length; i++) {
-            var variant = variants[i];
-            if (!variant.equals("CMF")){
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2021));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2021));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2021));
-
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
-                permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2025));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2025));
-                permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2025));
+        for (var variant : GetVariants()) {
+            for (var specVersion : GetSpecVersions(variant)) {
+                for (var platform : DynamicScheme.Platform.values()) {
+                    for (var isDark : new boolean[] {false, true}) {
+                        for (var contrastLevel : TestThemeCreator.ContrastLevelType.values()) {
+                            permutations.add(new TestThemePermutation(
+                                    variant, specVersion, platform, isDark, contrastLevel));
+                        }
+                    }
+                }
             }
-
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2026));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2026));
-            permutations.add(new TestThemePermutation(variant, false, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2026));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Normal, ColorSpec.SpecVersion.SPEC_2026));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.Medium, ColorSpec.SpecVersion.SPEC_2026));
-            permutations.add(new TestThemePermutation(variant, true, CsharpTestThemeCreator.ContrastLevelType.High, ColorSpec.SpecVersion.SPEC_2026));
         }
         return permutations;
     }
 
-    private static String[] GetVariants(){
+    private static String[] GetVariants() {
         return new String[] {
                 "Monochrome",
                 "Neutral",
@@ -48,5 +34,12 @@ public class TestThemePermutationCreator {
                 "FruitSalad",
                 "CMF"
         };
+    }
+
+    private static ColorSpec.SpecVersion[] GetSpecVersions(String variant) {
+        if (variant.equals("CMF")) {
+            return new ColorSpec.SpecVersion[] {ColorSpec.SpecVersion.SPEC_2026};
+        }
+        return ColorSpec.SpecVersion.values();
     }
 }
