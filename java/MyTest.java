@@ -38,7 +38,7 @@ public class MyTest {
                     permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion,
                     permutation.Platform, permutation.VariantName));
 
-            if (permutation.VariantName.equals("CMF")) {
+            if (permutation.VariantName.equals("CMF") || permutation.VariantName.equals("Content")) {
                 for (int colorIndexTwo = 0; colorIndexTwo < TestThemeCreator.GetColorCount(); colorIndexTwo++) {
                     testCases.add(TestThemeCreator.GetTestThemeCase(colorIndex, colorIndexTwo,
                             permutation.IsDark, permutation.ContrastLevel, permutation.SpecVersion,
