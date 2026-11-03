@@ -27,10 +27,11 @@ jobs:
       - name: Run MyTest
         run: |
           output_dir="${RUNNER_TEMP}/mytest-output"
-          java -cp target/classes MyTest "$output_dir"
+          mvn --batch-mode --no-transfer-progress dependency:build-classpath -Dmdep.outputFile=target/runtime-classpath.txt
+          java -cp "target/classes:$(cat target/runtime-classpath.txt)" MyTest "$output_dir"
 
-          generated_file="$(find "$output_dir" -type f -name '*.cs' -print -quit)"
+          generated_file="$(find "$output_dir" -type f -name '*.json' -print -quit)"
           if [ -z "$generated_file" ]; then
-            echo "MyTest completed without generating any C# files."
+            echo "MyTest completed without generating any JSON files."
             exit 1
           fi
