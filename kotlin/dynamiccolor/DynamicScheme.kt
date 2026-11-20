@@ -287,8 +287,8 @@ open class DynamicScheme(
     get() = getArgb(dynamicColors.onTertiaryFixedVariant)
 
   companion object {
-    val DEFAULT_SPEC_VERSION = SpecVersion.SPEC_2021
-    val DEFAULT_PLATFORM = Platform.PHONE
+    val DEFAULT_SPEC_VERSION: SpecVersion = SpecVersion.SPEC_2021
+    val DEFAULT_PLATFORM: Platform = Platform.PHONE
 
     @JvmStatic
     fun from(other: DynamicScheme, isDark: Boolean): DynamicScheme {
